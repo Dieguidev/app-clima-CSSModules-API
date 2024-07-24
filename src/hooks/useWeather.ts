@@ -1,6 +1,8 @@
 import axios from "axios";
 import { SearchType } from "../types";
 import { z } from "zod";
+// import * as v  from 'valibot'
+
 
 //*typeGuard o assertion
 // function isWheaterResponse(weather: unknown): weather is Weather {
@@ -23,8 +25,19 @@ const Weather = z.object({
     temp_max: z.number()
   })
 })
-
 type Weather = z.infer<typeof Weather>
+
+//*valibot
+// const WeatherSchema = v.object({
+//   name: v.string(),
+//   main: v.object({
+//     temp: v.number(),
+//     temp_min: v.number(),
+//     temp_max: v.number()
+//   })
+// })
+// type Weather = v.InferOutput<typeof WeatherSchema>
+
 
 
 export default function useWeather() {
@@ -55,13 +68,18 @@ export default function useWeather() {
       // }
 
       //*zod
-      const { data: weatherData } = await axios<Weather>(weatherUrl)
+      const { data: weatherData } = await axios(weatherUrl)
       const result = Weather.safeParse(weatherData)
       if (result.success) {
         console.log(weatherData.name);
       } else {
         console.log("No es una respuesta válida");
       }
+
+      //*valibot
+      // const { data: weatherData } = await axios(weatherUrl)
+      // const result = v.parse(WeatherSchema, weatherData)
+      // console.log(result);
 
 
     } catch (error) {
