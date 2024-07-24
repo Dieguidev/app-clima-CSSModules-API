@@ -1,6 +1,7 @@
 import axios from "axios";
 import { SearchType } from "../types";
 import { z } from "zod";
+import { useState } from "react";
 // import * as v  from 'valibot'
 
 
@@ -42,9 +43,17 @@ type Weather = z.infer<typeof Weather>
 
 export default function useWeather() {
 
-  const appId = import.meta.env.VITE_API_KEY;
+  const [weather, setWeather] = useState({
+    name: "",
+    main: {
+      temp: 0,
+      temp_min: 0,
+      temp_max: 0
+    }
+  })
 
   const fetchWeather = async (search: SearchType) => {
+    const appId = import.meta.env.VITE_API_KEY;
     try {
       const geoUrl = `http://api.openweathermap.org/geo/1.0/direct?q=${search.city},${search.country}&appid=${appId}`;
       const { data } = await axios(geoUrl)
@@ -71,7 +80,7 @@ export default function useWeather() {
       const { data: weatherData } = await axios(weatherUrl)
       const result = Weather.safeParse(weatherData)
       if (result.success) {
-        console.log(weatherData.name);
+        setWeather(result.data)
       } else {
         console.log("No es una respuesta válida");
       }
@@ -90,6 +99,7 @@ export default function useWeather() {
   }
 
   return {
+    weather,
     fetchWeather
   }
 }
