@@ -1,17 +1,31 @@
 import axios from "axios";
-import { SearchType, Weather } from "../types";
+import { SearchType } from "../types";
+import { z } from "zod";
 
 //*typeGuard o assertion
-function isWheaterResponse(weather: unknown): weather is Weather {
-  return (
-    Boolean(weather) &&
-    typeof weather === "object" &&
-    typeof (weather as Weather).name === "string" &&
-    typeof (weather as Weather).main.temp === "number" &&
-    typeof (weather as Weather).main.temp_min === "number" &&
-    typeof (weather as Weather).main.temp_max === "number"
-  )
-}
+// function isWheaterResponse(weather: unknown): weather is Weather {
+//   return (
+//     Boolean(weather) &&
+//     typeof weather === "object" &&
+//     typeof (weather as Weather).name === "string" &&
+//     typeof (weather as Weather).main.temp === "number" &&
+//     typeof (weather as Weather).main.temp_min === "number" &&
+//     typeof (weather as Weather).main.temp_max === "number"
+//   )
+// }
+
+//*ZOD
+const Weather = z.object({
+  name: z.string(),
+  main: z.object({
+    temp: z.number(),
+    temp_min: z.number(),
+    temp_max: z.number()
+  })
+})
+
+type Weather = z.infer<typeof Weather>
+
 
 export default function useWeather() {
 
@@ -32,12 +46,22 @@ export default function useWeather() {
       // console.log(weatherData);
 
       //* type Guards
-      const { data: weatherData } = await axios<Weather>(weatherUrl)
-      const result = isWheaterResponse(weatherData)
-      if (result) {
-        console.log(weatherData);
-      }
+      // const { data: weatherData } = await axios<Weather>(weatherUrl)
+      // const result = isWheaterResponse(weatherData)
+      // if (result) {
+      //   console.log(weatherData.name);
+      // } else {
+      //   console.log("No es una respuesta válida");
+      // }
 
+      //*zod
+      const { data: weatherData } = await axios<Weather>(weatherUrl)
+      const result = Weather.safeParse(weatherData)
+      if (result.success) {
+        console.log(weatherData.name);
+      } else {
+        console.log("No es una respuesta válida");
+      }
 
 
     } catch (error) {
