@@ -26,7 +26,7 @@ const Weather = z.object({
     temp_max: z.number()
   })
 })
-type Weather = z.infer<typeof Weather>
+ export type Weather = z.infer<typeof Weather>
 
 //*valibot
 // const WeatherSchema = v.object({
