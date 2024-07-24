@@ -3,7 +3,7 @@ import { SearchType } from "../types";
 
 export default function useWeather() {
 
-  const appId = 'f00f99d71ae73aa3278b92588dee39f0'
+  const appId = import.meta.env.VITE_API_KEY;
 
   const fetchWeather = async (search: SearchType) => {
     try {
